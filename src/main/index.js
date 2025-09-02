@@ -1,7 +1,21 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../resources/icon.png?asset';
+
+function handleSetTitle(event, title) {
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  win.setTitle(title);
+
+}
+
+async function handleFileOpne() {
+  const { canceled, filePaths }  = await dialog.showOpenDialog();
+  if(!canceled) {
+    return filePaths[0];
+  }
+}
 
 function createWindow() {
   // Create the browser window.
@@ -9,7 +23,7 @@ function createWindow() {
     width: 900,
     height: 670,
     show: false,
-    autoHideMenuBar: true,
+    autoHideMenuBar: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -20,6 +34,9 @@ function createWindow() {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+
+  // 打开 DevTools，默认位置
+  mainWindow.webContents.openDevTools({mode:'undocked'})
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -50,7 +67,11 @@ app.whenReady().then(() => {
   })
 
   // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.on('ping', () => console.log('pong'));
+  ipcMain.on('set-title', handleSetTitle);
+
+  ipcMain.handle('dialog:openFile', handleFileOpne);
+  ipcMain.handle('ping', () => 'pong');
 
   createWindow()
 
@@ -59,7 +80,14 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+
+  if(process.platform === 'linux') {
+    app.commandLine.appendSwitch('--no-sandbox')
+  }
 })
+
+
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -70,5 +98,7 @@ app.on('window-all-closed', () => {
   }
 })
 
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+console.log('Hello from Electron 👋')

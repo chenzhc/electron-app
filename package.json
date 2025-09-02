@@ -1,5 +1,5 @@
 {
-  "name": "electron-app-desktop",
+  "name": "electron-app",
   "version": "1.0.0",
   "description": "An Electron application with Vue",
   "main": "./out/main/index.js",
@@ -19,7 +19,15 @@
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
-    "@electron-toolkit/utils": "^4.0.0"
+    "@electron-toolkit/utils": "^4.0.0",
+    "d3": "^7.9.0",
+    "echarts": "^6.0.0",
+    "element-plus": "^2.11.1",
+    "pinia": "^3.0.3",
+    "sass": "^1.91.0",
+    "serialport": "^13.0.0",
+    "sqlite3": "^5.1.7",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.0.0",
@@ -39,6 +47,9 @@
     "onlyBuiltDependencies": [
       "electron",
       "esbuild"
+    ],
+    "ignoredBuiltDependencies": [
+      "sqlite3"
     ]
   }
 }

@@ -1,7 +1,37 @@
 <script setup>
+import { ref, useTemplateRef } from 'vue';
 import Versions from './components/Versions.vue'
 
+
 const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+const infoText  = ref(`本应用正在使用 Chrome (v${versions.chrome()}), Node.js (v${versions.node()}) 和 Electron (v${versions.electron()})`);
+
+console.log(versions.chrome())
+// information.innerText = `本应用正在使用 Chrome (v${Versions.chrome()})`;
+
+const func = async () => {
+  const response = await window.versions.ping()
+  console.log(response);
+  window.myApi.setTitle("test title");
+
+}
+
+func();
+
+console.log(window.myApi);
+
+const title = ref("");
+
+function setWinTtile() {
+  window.myApi.setTitle(title.value);
+}
+
+const filePath = ref("");
+async function openAFile() {
+  const _filePath = await window.myApi.openFile();
+  filePath.value = _filePath;
+}
+
 </script>
 
 <template>
@@ -12,6 +42,13 @@ const ipcHandle = () => window.electron.ipcRenderer.send('ping')
     <span class="vue">Vue</span>
   </div>
   <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
+  <p>👋</p>
+  <div ref="info">{{ infoText }}</div>
+  Title: <input v-model="title"></input>
+  <button id="btn" type="button" @click="setWinTtile">Set</button>,
+  <button type="button" @click="openAFile()">Open a File</button>
+  File path: <strong>{{ filePath }}</strong>
+
   <div class="actions">
     <div class="action">
       <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
