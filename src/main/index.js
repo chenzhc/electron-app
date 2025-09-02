@@ -92,6 +92,17 @@ app.whenReady().then(() => {
     console.log(value);
   })
 
+  // ipcMain.on('port', (event) => {
+  //   const port = event.ports[0];
+
+  //   port.on('message', (event) => {
+  //     const data = event.data;
+  //     console.log(data);
+  //   })
+
+  //   port.start();
+  // })
+
   ipcMain.handle('dialog:openFile', handleFileOpne);
   ipcMain.handle('ping', () => 'pong');
 
