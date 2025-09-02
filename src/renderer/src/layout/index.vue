@@ -6,14 +6,14 @@ import Sidebar from '@renderer/layout/components/Sidebar';
 
 <template>
   <div style="height: 100vh; box-shadow: var(--el-border-color-light) 0px 0px 10px" >
-    <el-splitter>
-      <el-splitter-panel :resizable="false" size="200">
-        <Sidebar></Sidebar>
-      </el-splitter-panel>
-      <el-splitter-panel :min="200">
-        <RouterView />
-      </el-splitter-panel>
-    </el-splitter>
+    <el-container>
+        <el-aside width="200px">
+            <Sidebar></Sidebar>
+        </el-aside>
+        <el-main>
+          <RouterView />
+        </el-main>
+    </el-container>
   </div>
 </template>
 

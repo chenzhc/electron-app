@@ -14,6 +14,10 @@ const myApi = {
     desktop: true,
     setTitle: (title) => ipcRenderer.send('set-title', title),
     openFile: () => ipcRenderer.invoke('dialog:openFile'),
+    onUpdateCounter: (callback) => ipcRenderer.on('update-counter', (_event, value) => {
+      return callback(value)
+    }),
+    counterValue: (value) => ipcRenderer.send('counter-value', value),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -35,3 +39,9 @@ if (process.contextIsolated) {
   window.myApi = myApi;
   
 }
+
+ipcRenderer.on("asynchronous-reply", (_event, arg) => {
+  console.log("preload: " + arg);
+})
+ipcRenderer.send("asynchronous-message", 'ping');
+

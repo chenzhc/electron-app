@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, Menu, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset';
@@ -30,6 +30,25 @@ function createWindow() {
       sandbox: false
     }
   })
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: app.name,
+      submenu: [
+        {
+          click: () => mainWindow.webContents.send('update-counter', 1),
+          label: 'Increment',
+        },
+        {
+          click: () => mainWindow.webContents.send('update-counter', -1),
+          label: 'Decrement',
+        }
+      ]
+    }
+  ]);
+
+  Menu.setApplicationMenu(menu);
+  
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -69,9 +88,18 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on('ping', () => console.log('pong'));
   ipcMain.on('set-title', handleSetTitle);
+  ipcMain.on('counter-value', (_event, value) => {
+    console.log(value);
+  })
 
   ipcMain.handle('dialog:openFile', handleFileOpne);
   ipcMain.handle('ping', () => 'pong');
+
+  ipcMain.on('asynchronous-message', (event, arg) => {
+    console.log("main: " + arg);
+
+    event.reply('asynchronous-reply', 'pong');
+  })
 
   createWindow()
 

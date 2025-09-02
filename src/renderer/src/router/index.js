@@ -10,18 +10,19 @@ const routes = [
         component: layout,
         redirect: '/index',
         children: [
-           {
+            {
                 path: '/index',
                 component: () => import('@renderer/views/HomeView.vue'),
                 name: 'Index',
-           }
-
+            },
+            {
+                path: '/about',
+                component: () => import('@renderer/views/AboutView.vue'),
+                name: 'About',
+            }
         ]
     },
-    { 
-        path: '/about', 
-        component: AboutView 
-    },
+    
 ]
 
 const router = createRouter({
