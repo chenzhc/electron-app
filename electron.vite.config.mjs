@@ -10,10 +10,16 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
+    css: {
+      preprocessorOptions: {
+        scss: { api: 'modern-compiler' },
+      }
+    },
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src')
-      }
+      },
+      extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
     },
     plugins: [vue()]
   }
