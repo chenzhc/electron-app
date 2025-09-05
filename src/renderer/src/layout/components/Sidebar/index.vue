@@ -1,21 +1,30 @@
 <template>
     <div  class="sidebar-container">
-      <el-menu>
-        <el-menu-item index="1">
-          <el-icon></el-icon>
-          <template #title>
-            <router-link to="/index">Home</router-link>
-          </template>
-        </el-menu-item>
-        <el-menu-item index="2">
-          <el-icon></el-icon>
-          <template #title>
-            <router-link to="/about">About</router-link>
-          </template>
-        </el-menu-item>
-      </el-menu>
+        <el-form v-model="form" 
+            size="small"
+            class="formClass" >
+            <el-form-item label="串口号:" prop="serialPort">
+                <el-select v-model="form.serialPort" placeholder="请选择串口">
+                    <el-option v-for="item in serialPortList"
+                      :key="item.value"
+                      :label="item.label" 
+                      :value="item.value" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="波特率:" prop="rate">
+                <el-select v-model="form.rate" placeholder="请选择串口">
+                    <el-option v-for="item in rateList"
+                      :key="item.value"
+                      :label="item.label" 
+                      :value="item.value" />
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div class="wrapper">
+          <el-button type="primary" class="button">打开串口</el-button>
+        </div>
         
-    </div>
+    </div>      
 </template>
 <script setup>
 import {
@@ -29,7 +38,45 @@ import {
   Refresh,
   Menu
 } from '@element-plus/icons-vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+
+const serialPortList = ref([]);
+const form = ref({
+  serialPort: null,
+  rate: 9600,
+});
+// 2400 、4800、9600、19200、38400、57600、115200
+const rateList = ref([
+  {
+    label: 2400,
+    value: 2400,
+  },
+  {
+    label: 4800,
+    value: 4800,
+  },
+  {
+    label: 9600,
+    value: 9600,
+  },
+  {
+    label: 19200,
+    value: 19200,
+  },
+  {
+    label: 38400,
+    value: 38400,
+  },
+ {
+    label: 57600,
+    value: 57600,
+  },
+  {
+    label: 115200,
+    value: 115200,
+  },
+]);
+
 
 function handleOpen() {
 
@@ -39,47 +86,45 @@ function handleClose() {
 
 }
 
-const getMenuBackground = computed(() => {
-  return "$theme-dark";
+onMounted(async () => { 
+  // let rsp = await window.myApi.showSpList();
+  let rsp = await window.myApi.getSerialPortList();
+  console.log("rsp: ", rsp);
+  if(rsp!=null && rsp.length>0) {
+      rsp.forEach((it)=> {
+        serialPortList.value.push({
+          label: it.path,
+          value: it.path,
+        });
+      });
+      if(serialPortList.value.length>0){
+          form.value.serialPort = serialPortList.value[0].value;
+      }
+  }
 });
+
 </script>
 <style lang="scss" scoped> 
-@use '@renderer/assets/styles/variables.module.scss' as vars;
-
+.el-form-item {
+  margin-bottom: 5px;
+}
 .el-menu--horizontal {
   --el-menu-horizontal-height: 50px;
 }
 .sidebar-container {
-  background-color: vars.$base-menu-background;
+  background-color: whitesmoke;
+
+  .wrapper {
+    padding: 5px;
+
+    .button {
+      width: 100%;
+    }
+  }
   
   .scrollbar-wrapper {
-    background-color: vars.$base-menu-background;
+    background-color: whitesmoke;
   }
 
-  .el-menu {
-    border: none;
-    height: 100%;
-    width: 100% !important;
-    
-    .el-menu-item, .el-sub-menu__title {
-      &:hover {
-        background-color: var(--menu-hover, rgba(0, 0, 0, 0.06)) !important;
-      }
-    }
-
-    .el-menu-item {
-      color: v-bind(getMenuTextColor);
-      height: 30px;
-      
-      &.is-active {
-        color: var(--menu-active-text, #409eff);
-        background-color: var(--menu-hover, vars.$base-menu-background) !important;
-      }
-    }
-
-    .el-sub-menu__title {
-      color: v-bind(getMenuTextColor);
-    }
-  }
 }
 </style>

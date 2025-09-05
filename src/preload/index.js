@@ -1,6 +1,14 @@
 import { contextBridge, ipcMain, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { SerialPort } from 'serialport';
 
+async function showPortList() {
+  const ports = await SerialPort.list()
+  console.log("showPortList: ",ports);
+  return ports;
+}
+
+process.stdout.setDefaultEncoding('utf8');
 // Custom APIs for renderer
 const api = {}
 const versions = {
@@ -17,7 +25,9 @@ const myApi = {
     onUpdateCounter: (callback) => ipcRenderer.on('update-counter', (_event, value) => {
       return callback(value)
     }),
-    counterValue: (value) => ipcRenderer.send('counter-value', value),
+    counterValue: (value) => ipcRenderer.send('counter-value', value), 
+    showSpList: () => ipcRenderer.sendSync('show-splist'),
+    getSerialPortList: () => ipcRenderer.invoke('getPortList'),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -44,4 +54,5 @@ ipcRenderer.on("asynchronous-reply", (_event, arg) => {
   console.log("preload: " + arg);
 })
 ipcRenderer.send("asynchronous-message", 'ping');
+
 

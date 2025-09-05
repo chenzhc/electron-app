@@ -2,6 +2,14 @@ import { app, shell, BrowserWindow, Menu, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset';
+import { SerialPort } from 'serialport';
+
+// 获取串口列表
+async function showPortList() {
+  const ports = await SerialPort.list()
+  // console.log("showPortList: ",ports);
+  return ports;
+}
 
 function handleSetTitle(event, title) {
   const webContents = event.sender;
@@ -20,8 +28,8 @@ async function handleFileOpne() {
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1260,
+    height: 850,
     show: false,
     autoHideMenuBar: false,
     ...(process.platform === 'linux' ? { icon } : {}),
@@ -47,7 +55,7 @@ function createWindow() {
     }
   ]);
 
-  Menu.setApplicationMenu(menu);
+  // Menu.setApplicationMenu(menu);
   
 
   mainWindow.on('ready-to-show', () => {
@@ -105,9 +113,14 @@ app.whenReady().then(() => {
 
   ipcMain.handle('dialog:openFile', handleFileOpne);
   ipcMain.handle('ping', () => 'pong');
+  ipcMain.handle('getPortList', showPortList);
 
+  ipcMain.on('show-splist', async (event, arg) => {
+      let portList = await showPortList();
+      event.returnValue = portList;
+  });
   ipcMain.on('asynchronous-message', (event, arg) => {
-    console.log("main: " + arg);
+    // console.log("main: " + arg);
 
     event.reply('asynchronous-reply', 'pong');
   })
