@@ -134,7 +134,8 @@ app.whenReady().then(() => {
   })
 
 
-  if(process.platform === 'linux') {
+  console.log(process.platform);
+  if(process.platform == 'linux') {
     app.commandLine.appendSwitch('--no-sandbox')
   }
 })
